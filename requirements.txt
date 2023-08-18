@@ -4,6 +4,6 @@ statsmodels
 matplotlib
 seaborn
 plotly
+scikit-learn
 numpy
 scipy
-scikit-learn
