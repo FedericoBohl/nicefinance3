@@ -1,3 +1,4 @@
 yfinance
 arch
 statsmodels
+matplotlib
