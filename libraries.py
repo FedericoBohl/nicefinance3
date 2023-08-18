@@ -30,8 +30,8 @@ def convert_df(df):
 def plot_data(hide_split=False):
     fig = go.Figure()
     fig.add_trace(go.Scatter(x=S.data.index, y=S.data['Close'], line=dict(color='lime')))
-    if S.split != 1 and (hide_split is not True):
-        fig.add_vline(S.data.index[round(len(S.data) * S.split, 0)], line_dash="dash", line_color="white")
+    #if S.split != 1 and (hide_split is not True):
+        #fig.add_vline(S.data.index[round(len(S.data) * S.split, 0)], line_dash="dash", line_color="white")
 
     fig.update_layout(xaxis_title='Date', yaxis_title=r'Y')
     st.plotly_chart(fig, use_container_width=True)
