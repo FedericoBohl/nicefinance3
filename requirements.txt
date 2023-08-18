@@ -2,3 +2,8 @@ yfinance
 arch
 statsmodels
 matplotlib
+seaborn
+plotly
+numpy
+scipy
+sklearn
