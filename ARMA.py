@@ -107,7 +107,10 @@ def arma():
             S.test_data = S.data.iloc[split_index:]
             model = ARIMA(S.train_data['Close'], order=(S.p,S.d,S.q))
             S.results = model.fit()
-            S.model=True
+            S.model=model
+            st.write(len(S.data))
+            st.write(len(S.train_data))
+            st.write(len(S.test_data))
         if 'model' in S:
             results=S.results
             train_data=S.train_data
