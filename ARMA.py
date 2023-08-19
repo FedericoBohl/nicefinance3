@@ -107,29 +107,31 @@ def arma():
             S.test_data = S.data.iloc[split_index:]
             model = ARIMA(S.train_data['Close'], order=(S.p,S.d,S.q))
             S.results = model.fit()
-            S.results.predict()
             S.model=True
         if 'model' in S:
-
-            train_predictions = S.results.predict(start=S.p,end=len(S.train_data)-1)
-            test_predictions = S.results.predict(start=len(S.train_data), end=len(S.data)-1)
-            train_rmse = np.sqrt(mean_squared_error(S.train_data['Close'][S.p:], train_predictions))
-            test_rmse = np.sqrt(mean_squared_error(S.test_data['Close'], test_predictions))
+            results=S.results
+            train_data=S.train_data
+            test_data=S.test_data
+            results.predict()
+            train_predictions = results.predict(start=S.p,end=len(train_data)-1)
+            test_predictions = results.predict(start=len(train_data), end=len(S.data)-1)
+            train_rmse = np.sqrt(mean_squared_error(train_data['Close'][S.p:], train_predictions))
+            test_rmse = np.sqrt(mean_squared_error(test_data['Close'], test_predictions))
 
             loglike, sumary = st.columns((0.3, 0.7))
             with loglike:
                 st.subheader('$Likelihood$')
                 st.dataframe({
-                    '': {'BIC': round(S.results.bic, 4),
-                         'AIC': round(S.results.aic, 4),
-                         'HQIC': round(S.results.hqic, 4)
+                    '': {'BIC': round(results.bic, 4),
+                         'AIC': round(results.aic, 4),
+                         'HQIC': round(results.hqic, 4)
                          }
                 })
             with sumary:
                 st.subheader('$Summary$')
-                pvals = np.array(S.results.pvalues)[:-1]
-                z = np.array(S.results.zvalues)[:-1]
-                coef = np.concatenate((np.array(S.results.arparams), np.array(S.results.maparams)), axis=0)
+                pvals = np.array(results.pvalues)[:-1]
+                z = np.array(results.zvalues)[:-1]
+                coef = np.concatenate((np.array(results.arparams), np.array(results.maparams)), axis=0)
 
                 names = []
                 for i in range(S.p):
@@ -160,13 +162,18 @@ def arma():
             train_nan[:] = np.nan
             test = np.concatenate((train_nan, test_predictions))
 
-            price = np.concatenate((S.train_data, S.test_data))
+            price = np.concatenate((train_data, test_data))
             fig = go.Figure()
             fig.add_trace(go.Scatter(x=date, y=S.data['Close'], line=dict(color='lime'), name='Y'))
             fig.add_trace(go.Scatter(x=date, y=train, line=dict(color='royalblue'), name='Training'))
             fig.add_trace(go.Scatter(x=date, y=test, line=dict(color='rgb(220, 20, 60)', dash='dash'), name='Testing'))
             if S.split != 1:
                 fig.add_vline(S.data.index[int(round(len(S.data) * S.split - 1, 0))], line_dash="dash", line_color="white")
+                #st.write(S.data.index)
+                #st.write(len(S.data))
+                #st.write(S.split)
+                #st.write()
+                #fig.add_vline(100, line_dash="dash", line_color="white")
             fig.update_layout(xaxis_title='Date', yaxis_title=r'Y')
             st.plotly_chart(fig, use_container_width=True)
 
