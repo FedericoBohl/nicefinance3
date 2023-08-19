@@ -101,9 +101,6 @@ def arma():
         else:
             S.data = S.duplicate
     def arma_model():
-        st.write(len(S.data))
-        st.write(len(S.train_data))
-        st.write(len(S.test_data))
         if st.button(r'$\text{Create model}$', use_container_width=True):
             split_index = int(len(S.data) * S.split)
             S.train_data = S.data.iloc[:split_index]
