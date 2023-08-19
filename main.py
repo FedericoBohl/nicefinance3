@@ -48,5 +48,6 @@ if S.data is not None:
     page = st.sidebar.radio(r"$\text{Select a model}$", list(models.keys()))
     models[page]()
 st.empty()
+st.empty()
 st.divider()
 st.text('For recomendations, issues or questions, you can reach me at federicobohl@uca.edu.ar\nor in LinkedIn: Federico Ivan Bohl')
