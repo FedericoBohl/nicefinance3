@@ -165,12 +165,12 @@ def arma():
             fig.add_trace(go.Scatter(x=date, y=train, line=dict(color='royalblue'), name='Training'))
             fig.add_trace(go.Scatter(x=date, y=test, line=dict(color='rgb(220, 20, 60)', dash='dash'), name='Testing'))
             if S.split != 1:
-                #fig.add_vline(S.data.index[round(len(S.data) * S.split-1, 0)], line_dash="dash", line_color="white")
-                st.write(S.data.index)
-                st.write(len(S.data))
-                st.write(S.split)
-                st.write(int(round(len(S.data) * S.split - 1, 0)))
-                fig.add_vline(100, line_dash="dash", line_color="white")
+                fig.add_vline(S.data.index[int(round(len(S.data) * S.split - 1, 0))], line_dash="dash", line_color="white")
+                #st.write(S.data.index)
+                #st.write(len(S.data))
+                #st.write(S.split)
+                #st.write()
+                #fig.add_vline(100, line_dash="dash", line_color="white")
             fig.update_layout(xaxis_title='Date', yaxis_title=r'Y')
             st.plotly_chart(fig, use_container_width=True)
 
