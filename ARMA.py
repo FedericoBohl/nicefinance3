@@ -101,75 +101,78 @@ def arma():
         else:
             S.data = S.duplicate
     def arma_model():
-        split_index = int(len(S.data) * S.split)
-        train_data = S.data.iloc[:split_index]
-        test_data = S.data.iloc[split_index:]
-        model = ARIMA(train_data['Close'], order=(S.p,S.d,S.q))
-        results = model.fit()
-        results.predict()
-        train_predictions = results.predict(start=S.p,end=len(train_data)-1)
-        test_predictions = results.predict(start=len(train_data), end=len(S.data)-1)
-        train_rmse = np.sqrt(mean_squared_error(train_data['Close'][S.p:], train_predictions))
-        test_rmse = np.sqrt(mean_squared_error(test_data['Close'], test_predictions))
+        if st.button(r'$\text{Create model}$', use_container_width=True):
+            split_index = int(len(S.data) * S.split)
+            train_data = S.data.iloc[:split_index]
+            test_data = S.data.iloc[split_index:]
+            model = ARIMA(train_data['Close'], order=(S.p,S.d,S.q))
+            results = model.fit()
+            S.model=True
+        if 'model' in S:
+            results.predict()
+            train_predictions = results.predict(start=S.p,end=len(train_data)-1)
+            test_predictions = results.predict(start=len(train_data), end=len(S.data)-1)
+            train_rmse = np.sqrt(mean_squared_error(train_data['Close'][S.p:], train_predictions))
+            test_rmse = np.sqrt(mean_squared_error(test_data['Close'], test_predictions))
 
-        loglike, sumary = st.columns((0.3, 0.7))
-        with loglike:
-            st.subheader('$Likelihood$')
-            st.dataframe({
-                '': {'BIC': round(results.bic, 4),
-                     'AIC': round(results.aic, 4),
-                     'HQIC': round(results.hqic, 4)
-                     }
-            })
-        with sumary:
-            st.subheader('$Summary$')
-            pvals = np.array(results.pvalues)[:-1]
-            z = np.array(results.zvalues)[:-1]
-            coef = np.concatenate((np.array(results.arparams), np.array(results.maparams)), axis=0)
+            loglike, sumary = st.columns((0.3, 0.7))
+            with loglike:
+                st.subheader('$Likelihood$')
+                st.dataframe({
+                    '': {'BIC': round(results.bic, 4),
+                         'AIC': round(results.aic, 4),
+                         'HQIC': round(results.hqic, 4)
+                         }
+                })
+            with sumary:
+                st.subheader('$Summary$')
+                pvals = np.array(results.pvalues)[:-1]
+                z = np.array(results.zvalues)[:-1]
+                coef = np.concatenate((np.array(results.arparams), np.array(results.maparams)), axis=0)
 
-            names = []
-            for i in range(S.p):
-                names.append(f'AR->{i + 1}')
-            for i in range(S.q):
-                names.append(f'MA->{i + 1}')
+                names = []
+                for i in range(S.p):
+                    names.append(f'AR->{i + 1}')
+                for i in range(S.q):
+                    names.append(f'MA->{i + 1}')
 
-            df = pd.DataFrame(zip(coef, z, pvals), columns=['Coefficient', 'Statistic', 'P-Value'], index=names)
-            st.dataframe(df, use_container_width=True)
+                df = pd.DataFrame(zip(coef, z, pvals), columns=['Coefficient', 'Statistic', 'P-Value'], index=names)
+                st.dataframe(df, use_container_width=True)
 
-        col1,space,col2=st.columns((0.45,0.1,0.45))
-        with col1:
-            st.subheader(f':blue[$RMSE\ $ $Train$:   ${round(train_rmse,4)}$]')
-            st.download_button(r'$\text{Download train predictions}$', data=convert_df(train_predictions), file_name=f'Train Predictions.csv', mime='text/csv')
-        with col2:
-            st.subheader(f':red[$RMSE\ $ $Test$:   ${round(test_rmse,4)}$]')
-            st.download_button(r'$\text{Download test predictions}$', data=convert_df(test_predictions), file_name=f'Test Predictions.csv',
-                               mime='text/csv')
-        st.divider()
-        date_train, date_test = S.data.index[len(S.data.index) - len(test_predictions) - len(train_predictions):len(S.data.index) - len(
-            test_predictions)], S.data.index[len(S.data.index) - len(test_predictions):]
-        date = np.concatenate((date_train, date_test))
-        test_nan = np.empty((len(date_test)))
-        test_nan[:] = np.nan
-        train = np.concatenate((train_predictions, test_nan))
+            col1,space,col2=st.columns((0.45,0.1,0.45))
+            with col1:
+                st.subheader(f':blue[$RMSE\ $ $Train$:   ${round(train_rmse,4)}$]')
+                st.download_button(r'$\text{Download train predictions}$', data=convert_df(train_predictions), file_name=f'Train Predictions.csv', mime='text/csv')
+            with col2:
+                st.subheader(f':red[$RMSE\ $ $Test$:   ${round(test_rmse,4)}$]')
+                st.download_button(r'$\text{Download test predictions}$', data=convert_df(test_predictions), file_name=f'Test Predictions.csv',
+                                   mime='text/csv')
+            st.divider()
+            date_train, date_test = S.data.index[len(S.data.index) - len(test_predictions) - len(train_predictions):len(S.data.index) - len(
+                test_predictions)], S.data.index[len(S.data.index) - len(test_predictions):]
+            date = np.concatenate((date_train, date_test))
+            test_nan = np.empty((len(date_test)))
+            test_nan[:] = np.nan
+            train = np.concatenate((train_predictions, test_nan))
 
-        train_nan = np.empty((len(date_train)))
-        train_nan[:] = np.nan
-        test = np.concatenate((train_nan, test_predictions))
+            train_nan = np.empty((len(date_train)))
+            train_nan[:] = np.nan
+            test = np.concatenate((train_nan, test_predictions))
 
-        price = np.concatenate((train_data, test_data))
-        fig = go.Figure()
-        fig.add_trace(go.Scatter(x=date, y=S.data['Close'], line=dict(color='lime'), name='Y'))
-        fig.add_trace(go.Scatter(x=date, y=train, line=dict(color='royalblue'), name='Training'))
-        fig.add_trace(go.Scatter(x=date, y=test, line=dict(color='rgb(220, 20, 60)', dash='dash'), name='Testing'))
-        if S.split != 1:
-            #fig.add_vline(S.data.index[round(len(S.data) * S.split-1, 0)], line_dash="dash", line_color="white")
-            st.write(S.data.index)
-            st.write(len(S.data))
-            st.write(S.split)
-            st.write(round(len(S.data) * S.split - 1, 0))
-            fig.add_vline(100, line_dash="dash", line_color="white")
-        fig.update_layout(xaxis_title='Date', yaxis_title=r'Y')
-        st.plotly_chart(fig, use_container_width=True)
+            price = np.concatenate((train_data, test_data))
+            fig = go.Figure()
+            fig.add_trace(go.Scatter(x=date, y=S.data['Close'], line=dict(color='lime'), name='Y'))
+            fig.add_trace(go.Scatter(x=date, y=train, line=dict(color='royalblue'), name='Training'))
+            fig.add_trace(go.Scatter(x=date, y=test, line=dict(color='rgb(220, 20, 60)', dash='dash'), name='Testing'))
+            if S.split != 1:
+                #fig.add_vline(S.data.index[round(len(S.data) * S.split-1, 0)], line_dash="dash", line_color="white")
+                st.write(S.data.index)
+                st.write(len(S.data))
+                st.write(S.split)
+                st.write(int(round(len(S.data) * S.split - 1, 0)))
+                fig.add_vline(100, line_dash="dash", line_color="white")
+            fig.update_layout(xaxis_title='Date', yaxis_title=r'Y')
+            st.plotly_chart(fig, use_container_width=True)
 
 
 
@@ -181,9 +184,7 @@ def arma():
     set_arma_parameters()
     info,tab1,tab2,tab3,tab4,tab5=st.tabs([r'$\text{Ticker Info}$',r'$\text{Model}$',r'$\text{Plots}$',r'$\text{Normality Analysis}$',r'$\text{Unit root}$',r'$\text{Heteroskedasticity}$'])
     with info:stock_info()
-    with tab1:
-        if st.button(r'$\text{Create model}$',use_container_width=True):
-            arma_model()
+    with tab1:arma_model()
     with tab2:
         plot_acf()
         plot_data()
