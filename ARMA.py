@@ -141,9 +141,9 @@ def arma():
 
                 names = []
                 for i in range(S.used_p):
-                    names.append(f'AR->{i + 1}')
+                    names.append(f'AR--->{i + 1}')
                 for i in range(S.used_q):
-                    names.append(f'MA->{i + 1}')
+                    names.append(f'MA--->{i + 1}')
 
                 df = pd.DataFrame(zip(coef, z, pvals), columns=['Coefficient', 'Statistic', 'P-Value'], index=names)
                 st.dataframe(df, use_container_width=True)
@@ -186,7 +186,7 @@ def arma():
     col1,space,col2 = streamlit.sidebar.columns((0.45,0.1,0.45))
     with col1:
         st.header('*ARIMA Model*')
-    with col2: S.split=(st.slider(r'$\text{Split Train-Test}$',min_value=0,max_value=100,value=70))/100
+    with col2: S.split=(st.slider(r'$\text{Split Train-Test}$',min_value=0,max_value=99,value=70))/100
     set_arma_parameters()
     info,tab1,tab2,tab3,tab4,tab5=st.tabs([r'$\text{Ticker Info}$',r'$\text{Model}$',r'$\text{Plots}$',r'$\text{Normality Analysis}$',r'$\text{Unit root}$',r'$\text{Heteroskedasticity}$'])
     with info:stock_info()
