@@ -144,11 +144,11 @@ def arma():
 
             col1,space,col2=st.columns((0.45,0.1,0.45))
             with col1:
-                a=r':blue[$\text{RMSE Train:}\quad$'
+                a=r':blue[$\text{RMSE Train}\quad:$'
                 st.subheader(f'{a}${round(train_rmse,4)}$]')
                 st.download_button(r'$\text{Download train predictions}$', data=convert_df(train_predictions), file_name=f'Train Predictions.csv', mime='text/csv')
             with col2:
-                a=r':red[$\text{RMSE Test:}\quad$'
+                a=r':red[$\text{RMSE Test:}\quad$:'
                 st.subheader(f'{a}${round(test_rmse,4)}$]')
                 st.download_button(r'$\text{Download test predictions}$', data=convert_df(test_predictions), file_name=f'Test Predictions.csv',
                                    mime='text/csv')
