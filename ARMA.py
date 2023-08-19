@@ -140,6 +140,7 @@ def arma():
                 coef = np.concatenate((np.array(results.arparams), np.array(results.maparams)), axis=0)
 
                 names = []
+                st.write(S.used_p)
                 for i in range(S.used_p):
                     names.append(f'AR->{i + 1}')
                 for i in range(S.used_q):
