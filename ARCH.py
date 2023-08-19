@@ -24,7 +24,7 @@ def arch():
     col1,col2=st.sidebar.columns((0.45,0.55))
     with col1:st.header('*ARCH Models*')
     with col2:
-       S.diff=st.checkbox(r'$\text{Differentiante}$', value=False)
+       S.diff=st.checkbox(r'$\text{Differentiate}$', value=False)
        if S.diff:
            S.data = (S.duplicate - S.duplicate.shift(1)).dropna()
        else: S.data=S.duplicate

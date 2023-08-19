@@ -169,7 +169,7 @@ def random_walk():
 
     df.loc['Test result'] = df.loc['p-value'].apply(test_result)
     # Create the DataFrame from the dictionary
-    st.dataframe(df)
+    st.dataframe(df,use_container_width=True)
     st.write('The "c" in trend means "Constant"')
 def stock_info():
     tick=yf.Ticker(S.ticker)
@@ -184,7 +184,10 @@ def stock_info():
                 except:pass
             try:
                 st.header('Company Officers')
-                st.dataframe(pd.DataFrame(tick.info['companyOfficers']).drop(columns=['maxAge','exercisedValue','unexercisedValue','age','yearBorn'],axis=1))
+                df=pd.DataFrame(tick.info['companyOfficers']).drop(columns=['maxAge','exercisedValue','unexercisedValue','age','yearBorn'],axis=1)
+                if 'fiscalYear' in df.columns:
+                    df=df.drop(columns=['fiscalYear','totalPay'],axis=1)
+                st.dataframe(df,use_container_width=True)
             except:pass
             st.header('Information')
             st.dataframe(basic_info,use_container_width=True)
