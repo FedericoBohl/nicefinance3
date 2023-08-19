@@ -107,9 +107,10 @@ def arma():
             S.test_data = S.data.iloc[split_index:]
             model = ARIMA(S.train_data['Close'], order=(S.p,S.d,S.q))
             S.results = model.fit()
+            S.results.predict()
             S.model=True
         if 'model' in S:
-            S.results.predict()
+
             train_predictions = S.results.predict(start=S.p,end=len(S.train_data)-1)
             test_predictions = S.results.predict(start=len(S.train_data), end=len(S.data)-1)
             train_rmse = np.sqrt(mean_squared_error(S.train_data['Close'][S.p:], train_predictions))
