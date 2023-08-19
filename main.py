@@ -50,4 +50,4 @@ if S.data is not None:
 st.empty()
 st.empty()
 st.divider()
-st.write('For recomendations, issues or questions, you can reach me at federicobohl@uca.edu.ar\nor in LinkedIn: Federico Ivan Bohl')
+st.write('For recomendations, issues or questions, you can reach me at *federicobohl@uca.edu.ar*\nor in LinkedIn: :blue[Federico Ivan Bohl]')
