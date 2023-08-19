@@ -101,6 +101,9 @@ def arma():
         else:
             S.data = S.duplicate
     def arma_model():
+        st.write(len(S.data))
+        st.write(len(S.train_data))
+        st.write(len(S.test_data))
         if st.button(r'$\text{Create model}$', use_container_width=True):
             split_index = int(len(S.data) * S.split)
             S.train_data = S.data.iloc[:split_index]
@@ -108,9 +111,6 @@ def arma():
             model = ARIMA(S.train_data['Close'], order=(S.p,S.d,S.q))
             S.results = model.fit()
             S.model=model
-            st.write(len(S.data))
-            st.write(len(S.train_data))
-            st.write(len(S.test_data))
         if 'model' in S:
             results=S.results
             train_data=S.train_data
