@@ -96,6 +96,7 @@ def arma():
         S.q = st.sidebar.slider(label='q',label_visibility='hidden',min_value= 0,max_value= 10, value=1)
         st.sidebar.latex(r'I(d)')
         S.d=st.sidebar.slider(label='d',label_visibility='hidden',min_value= 0,max_value= 5, value=0)
+
         if S.d!=0:
             S.data = (S.duplicate - S.duplicate.shift(S.d)).dropna()
         else:
@@ -106,79 +107,78 @@ def arma():
             S.train_data = S.data.iloc[:split_index]
             S.test_data = S.data.iloc[split_index:]
             model = ARIMA(S.train_data['Close'], order=(S.p,S.d,S.q))
+            S.used_p=S.p
+            S.used_q=S.q
+            S.used_d=S.d
+            S.data_used=S.data
             S.results = model.fit()
             S.model=model
         if 'model' in S:
-            if (len(S.train_data)+len(S.test_data))==len(S.data):
-                results=S.results
-                train_data=S.train_data
-                test_data=S.test_data
-                results.predict()
-                train_predictions = results.predict(start=S.p,end=len(train_data)-1)
-                test_predictions = results.predict(start=len(train_data), end=len(S.data)-1)
-                train_rmse = np.sqrt(mean_squared_error(train_data['Close'][S.p:], train_predictions))
-                test_rmse = np.sqrt(mean_squared_error(test_data['Close'], test_predictions))
+            #if (len(S.train_data)+len(S.test_data))==len(S.data):
+            results=S.results
+            train_data=S.train_data
+            test_data=S.test_data
+            results.predict()
+            train_predictions = results.predict(start=S.used_p,end=len(train_data)-1)
+            test_predictions = results.predict(start=len(train_data), end=len(S.data_used)-1)
+            train_rmse = np.sqrt(mean_squared_error(train_data['Close'][S.used_p:], train_predictions))
+            test_rmse = np.sqrt(mean_squared_error(test_data['Close'], test_predictions))
 
-                loglike, sumary = st.columns((0.3, 0.7))
-                with loglike:
-                    st.subheader(r'$\text{Likelihood}$')
-                    st.dataframe({
-                        '': {'BIC': round(results.bic, 4),
-                             'AIC': round(results.aic, 4),
-                             'HQIC': round(results.hqic, 4)
-                             }
-                    })
-                with sumary:
-                    st.subheader(r'$\text{Summary}$')
-                    pvals = np.array(results.pvalues)[:-1]
-                    z = np.array(results.zvalues)[:-1]
-                    coef = np.concatenate((np.array(results.arparams), np.array(results.maparams)), axis=0)
+            loglike, sumary = st.columns((0.3, 0.7))
+            with loglike:
+                st.subheader(r'$\text{Likelihood}$')
+                st.dataframe({
+                    '': {'BIC': round(results.bic, 4),
+                         'AIC': round(results.aic, 4),
+                         'HQIC': round(results.hqic, 4)
+                         }
+                })
+            with sumary:
+                st.subheader(r'$\text{Summary}$')
+                pvals = np.array(results.pvalues)[:-1]
+                z = np.array(results.zvalues)[:-1]
+                coef = np.concatenate((np.array(results.arparams), np.array(results.maparams)), axis=0)
 
-                    names = []
-                    for i in range(S.p):
-                        names.append(f'AR->{i + 1}')
-                    for i in range(S.q):
-                        names.append(f'MA->{i + 1}')
+                names = []
+                for i in range(S.used_p):
+                    names.append(f'AR->{i + 1}')
+                for i in range(S.used_q):
+                    names.append(f'MA->{i + 1}')
 
-                    df = pd.DataFrame(zip(coef, z, pvals), columns=['Coefficient', 'Statistic', 'P-Value'], index=names)
-                    st.dataframe(df, use_container_width=True)
+                df = pd.DataFrame(zip(coef, z, pvals), columns=['Coefficient', 'Statistic', 'P-Value'], index=names)
+                st.dataframe(df, use_container_width=True)
 
-                col1,space,col2=st.columns((0.45,0.1,0.45))
-                with col1:
-                    a=r':blue[$\text{RMSE Train:}\quad$ '
-                    st.subheader(f'{a}${round(train_rmse,4)}$]')
-                    st.download_button(r'$\text{Download train predictions}$', data=convert_df(train_predictions), file_name=f'Train Predictions.csv', mime='text/csv')
-                with col2:
-                    a=r':red[$\text{RMSE Test:}\quad$ '
-                    st.subheader(f'{a}${round(test_rmse,4)}$]')
-                    st.download_button(r'$\text{Download test predictions}$', data=convert_df(test_predictions), file_name=f'Test Predictions.csv',
-                                       mime='text/csv')
-                st.divider()
-                date_train, date_test = S.data.index[len(S.data.index) - len(test_predictions) - len(train_predictions):len(S.data.index) - len(
-                    test_predictions)], S.data.index[len(S.data.index) - len(test_predictions):]
-                date = np.concatenate((date_train, date_test))
-                test_nan = np.empty((len(date_test)))
-                test_nan[:] = np.nan
-                train = np.concatenate((train_predictions, test_nan))
+            col1,space,col2=st.columns((0.45,0.1,0.45))
+            with col1:
+                a=r':blue[$\text{RMSE Train:}\quad$ '
+                st.subheader(f'{a}${round(train_rmse,4)}$]')
+                st.download_button(r'$\text{Download train predictions}$', data=convert_df(train_predictions), file_name=f'Train Predictions.csv', mime='text/csv')
+            with col2:
+                a=r':red[$\text{RMSE Test:}\quad$ '
+                st.subheader(f'{a}${round(test_rmse,4)}$]')
+                st.download_button(r'$\text{Download test predictions}$', data=convert_df(test_predictions), file_name=f'Test Predictions.csv',
+                                   mime='text/csv')
+            st.divider()
+            date_train, date_test = S.data_used.index[len(S.data_used.index) - len(test_predictions) - len(train_predictions):len(S.data_used.index) - len(
+                test_predictions)], S.data_used.index[len(S.data_used.index) - len(test_predictions):]
+            date = np.concatenate((date_train, date_test))
+            test_nan = np.empty((len(date_test)))
+            test_nan[:] = np.nan
+            train = np.concatenate((train_predictions, test_nan))
 
-                train_nan = np.empty((len(date_train)))
-                train_nan[:] = np.nan
-                test = np.concatenate((train_nan, test_predictions))
+            train_nan = np.empty((len(date_train)))
+            train_nan[:] = np.nan
+            test = np.concatenate((train_nan, test_predictions))
 
-                price = np.concatenate((train_data, test_data))
-                fig = go.Figure()
-                fig.add_trace(go.Scatter(x=date, y=S.data['Close'], line=dict(color='lime'), name='Y'))
-                fig.add_trace(go.Scatter(x=date, y=train, line=dict(color='royalblue'), name='Training'))
-                fig.add_trace(go.Scatter(x=date, y=test, line=dict(color='rgb(220, 20, 60)', dash='dash'), name='Testing'))
-                if S.split != 1:
-                    fig.add_vline(S.data.index[int(round(len(S.data) * S.split - 1, 0))], line_dash="dash", line_color="white")
-                    #st.write(S.data.index)
-                    #st.write(len(S.data))
-                    #st.write(S.split)
-                    #st.write()
-                    #fig.add_vline(100, line_dash="dash", line_color="white")
-                fig.update_layout(xaxis_title='Date', yaxis_title=r'Y')
-                st.plotly_chart(fig, use_container_width=True)
+            price = np.concatenate((train_data, test_data))
+            fig = go.Figure()
+            fig.add_trace(go.Scatter(x=date, y=S.data_used['Close'], line=dict(color='lime'), name='Y'))
+            fig.add_trace(go.Scatter(x=date, y=train, line=dict(color='royalblue'), name='Training'))
+            fig.add_trace(go.Scatter(x=date, y=test, line=dict(color='rgb(220, 20, 60)', dash='dash'), name='Testing'))
+            if S.split != 1:
+                fig.add_vline(S.data_used.index[int(round(len(S.data_used) * S.split - 1, 0))], line_dash="dash", line_color="white")
+            fig.update_layout(xaxis_title='Date', yaxis_title=r'Y')
+            st.plotly_chart(fig, use_container_width=True)
 
 
 
