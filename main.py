@@ -8,7 +8,8 @@ st.set_page_config(
     page_title="Cool Finance",
     page_icon="📈",
     layout="wide",
-    initial_sidebar_state="expanded",)
+    theme='dark',
+    initial_sidebar_state="expanded")
 
 
 def get_stock_data(ticker, start_date, end_date):
