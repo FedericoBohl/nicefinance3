@@ -8,11 +8,7 @@ st.set_page_config(
     page_title="Cool Finance",
     page_icon="$",
     layout="wide",
-    initial_sidebar_state="expanded",
-    menu_items={
-        'Get Help': 'federicobohl@uca.edu.ar',
-    }
-)
+    initial_sidebar_state="expanded",)
 
 
 def get_stock_data(ticker, start_date, end_date):
