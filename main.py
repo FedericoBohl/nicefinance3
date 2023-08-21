@@ -6,7 +6,7 @@ from ARCH import *
 if 'data' not in S:S.data=None
 st.set_page_config(
     page_title="Cool Finance",
-    page_icon="$",
+    page_icon="📈",
     layout="wide",
     initial_sidebar_state="expanded",)
 
