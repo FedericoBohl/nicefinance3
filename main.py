@@ -4,7 +4,15 @@ from libraries import *
 from ARMA import *
 from ARCH import *
 if 'data' not in S:S.data=None
-st.set_page_config(layout="wide")
+st.set_page_config(
+    page_title="Cool Finance",
+    page_icon="$",
+    layout="wide",
+    initial_sidebar_state="expanded",
+    menu_items={
+        'Get Help': 'federicobohl@uca.edu.ar',
+    }
+)
 
 
 def get_stock_data(ticker, start_date, end_date):
