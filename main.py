@@ -8,7 +8,6 @@ st.set_page_config(
     page_title="Cool Finance",
     page_icon="📈",
     layout="wide",
-    theme='dark',
     initial_sidebar_state="expanded")
 
 
